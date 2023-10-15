@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Form, Field } from "react-final-form";
-import arrayMutators from "final-form-arrays";
-import { FieldArray } from "react-final-form-arrays";
+import { generatePairs } from "../utils";
 
 const NamesCollectionForm = ({ collect }) => {
   const [nameIds, setNameIds] = useState(["initialId"]);
@@ -52,7 +51,9 @@ const NamesCollectionForm = ({ collect }) => {
 };
 
 const RulesCollection = ({ data }) => {
-  const [config, setConfig] = useState(() => {
+  const [config, setConfig] = useState({});
+
+  useEffect(() => {
     const ids = Object.keys(data);
     const configToSet = ids.reduce((acc, id) => {
       return {
@@ -60,42 +61,77 @@ const RulesCollection = ({ data }) => {
         [id]: {
           id,
           name: data[id],
-          selectableIds: ids?.filter((innerId) => id !== innerId),
+          suggestions: ids?.filter((innerId) => id !== innerId),
+          selected: [],
         },
       };
     }, {});
-    console.log(configToSet);
-    return configToSet;
+    setConfig(configToSet);
+  }, []);
+  console.log({
+    title: "RENDER",
+    config,
   });
-  const ids = Object.keys(config);
   return (
     <div>
       Atzymekite kas negali tarpusavi keistis dovanomis:
       <br />
-      {data &&
-        ids?.map((id) => (
-          <div key="id">
-            <div>
-              <b>{data[id]}</b>
-            </div>
-            {[
-              config[id].selectableIds.map((i) => (
-                <span>
-                  <input type="checkbox" checked />
-                  {data[i]}
-                </span>
-              )),
-            ]}
-            <br />
+      {Object.values(config)?.map(({ id }) => (
+        <div key={id}>
+          <div>
+            <b>{config[id].name}</b>
           </div>
-        ))}
+          {config[id].suggestions.map((currentId) => (
+            <span key={currentId}>
+              <input
+                type="checkbox"
+                checked={config[id].selected.indexOf(currentId) > -1}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    console.log({
+                      title: "true",
+                      config,
+                    });
+                    const next = {
+                      ...config,
+                      [id]: {
+                        ...config[id],
+                        selected: [...config[id].selected, currentId],
+                      },
+                    };
+                    setConfig(next);
+                    console.log(config);
+                  } else {
+                    console.log({
+                      title: "ELSE",
+                      config,
+                    });
+                    setConfig({
+                      ...config,
+                      [id]: {
+                        ...config[id],
+                        selected: (config[id].selected || []).filter(
+                          (innerId) => currentId !== innerId
+                        ),
+                      },
+                    });
+                  }
+                }}
+              />
+              {data[currentId]}
+            </span>
+          ))}
+          <br />
+        </div>
+      ))}
+      <button onClick={() => generatePairs(config)}>Sugeneruoti poras</button>
     </div>
   );
 };
 
 export const InitialView = () => {
   const [listOfNames, setListOfNames] = useState(null);
-  console.log(listOfNames);
+  console.log("INITIAL VIEW");
   return (
     <div>
       {!listOfNames && (
