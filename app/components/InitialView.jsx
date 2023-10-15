@@ -1,7 +1,8 @@
-import { useState, useId } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Form } from "react-final-form";
-import { Field } from "react-final-form";
+import { Form, Field } from "react-final-form";
+import arrayMutators from "final-form-arrays";
+import { FieldArray } from "react-final-form-arrays";
 
 const NamesCollectionForm = ({ collect }) => {
   const [nameIds, setNameIds] = useState(["initialId"]);
@@ -50,6 +51,48 @@ const NamesCollectionForm = ({ collect }) => {
   );
 };
 
+const RulesCollection = ({ data }) => {
+  const [config, setConfig] = useState(() => {
+    const ids = Object.keys(data);
+    const configToSet = ids.reduce((acc, id) => {
+      return {
+        ...acc,
+        [id]: {
+          id,
+          name: data[id],
+          selectableIds: ids?.filter((innerId) => id !== innerId),
+        },
+      };
+    }, {});
+    console.log(configToSet);
+    return configToSet;
+  });
+  const ids = Object.keys(config);
+  return (
+    <div>
+      Atzymekite kas negali tarpusavi keistis dovanomis:
+      <br />
+      {data &&
+        ids?.map((id) => (
+          <div key="id">
+            <div>
+              <b>{data[id]}</b>
+            </div>
+            {[
+              config[id].selectableIds.map((i) => (
+                <span>
+                  <input type="checkbox" checked />
+                  {data[i]}
+                </span>
+              )),
+            ]}
+            <br />
+          </div>
+        ))}
+    </div>
+  );
+};
+
 export const InitialView = () => {
   const [listOfNames, setListOfNames] = useState(null);
   console.log(listOfNames);
@@ -58,14 +101,7 @@ export const InitialView = () => {
       {!listOfNames && (
         <NamesCollectionForm collect={(data) => setListOfNames(data)} />
       )}
-      {listOfNames && (
-        <div>
-          sarasasVardu:
-          {listOfNames &&
-            Object.keys(listOfNames)?.map((id) => <div>{listOfNames[id]}</div>)}
-        </div>
-      )}
-      <div></div>
+      {listOfNames && <RulesCollection data={listOfNames} />}
     </div>
   );
 };
