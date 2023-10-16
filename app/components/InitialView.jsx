@@ -51,8 +51,8 @@ const NamesCollectionForm = ({ collect }) => {
 };
 
 const RulesCollection = ({ data }) => {
+  const [pairs, setPairs] = useState(null);
   const [config, setConfig] = useState({});
-
   useEffect(() => {
     const ids = Object.keys(data);
     const configToSet = ids.reduce((acc, id) => {
@@ -124,18 +124,32 @@ const RulesCollection = ({ data }) => {
           <br />
         </div>
       ))}
-      <button onClick={() => generatePairs(config)}>Sugeneruoti poras</button>
+      <button
+        onClick={() => {
+          setPairs(generatePairs(config));
+        }}
+      >
+        Sugeneruoti poras
+      </button>
+      {pairs?.map((pair) => (
+        <div>{`${config[pair[0]].name} dovanoja dovana ${
+          config[pair[1]].name
+        }`}</div>
+      ))}
     </div>
   );
 };
 
 export const InitialView = () => {
   const [listOfNames, setListOfNames] = useState(null);
+
   console.log("INITIAL VIEW");
   return (
     <div>
       {!listOfNames && (
-        <NamesCollectionForm collect={(data) => setListOfNames(data)} />
+        <NamesCollectionForm
+          collect={(namesList) => setListOfNames(namesList)}
+        />
       )}
       {listOfNames && <RulesCollection data={listOfNames} />}
     </div>
