@@ -9,7 +9,7 @@ export default function Index() {
         pairing for a game or activity? Look no further! Our pair generator is
         here to make the process easy and enjoyable.
       </p>
-      <a href="/names">
+      <a href="/names" className="button">
         <div>
           <b>Begin</b>
         </div>

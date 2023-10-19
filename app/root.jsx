@@ -1,5 +1,9 @@
 import { Links, Meta, Outlet, Scripts, LiveReload } from "@remix-run/react";
-import { InitialView } from "./components/InitialView";
+
+import appStylesHref from "./styles/shared.css";
+
+export const links = () => [{ rel: "stylesheet", href: appStylesHref }];
+
 export default function App() {
   return (
     <html>
@@ -8,7 +12,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body style={{ margin: 0, padding: 0, background: "#4f0055" }}>
+      <body className="niceBg" style={{ margin: 0, padding: 0 }}>
         {/* <InitialView /> */}
         <Outlet />
         <Scripts />
